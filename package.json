@@ -1,0 +1,36 @@
+{
+  "name": "orpheus-tts-reader",
+  "version": "1.0.0",
+  "description": "Production-ready text-to-speech web application using Orpheus TTS models with Apple-inspired design",
+  "main": "src/backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "dev": "nodemon src/backend/server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "orpheus",
+    "audio",
+    "conversion"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.6.0",
+    "marked": "^9.1.6",
+    "node-fetch": "^3.3.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
