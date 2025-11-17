@@ -76,7 +76,7 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
   try {
     let text = req.body.text || '';
     const title = req.body.title || 'Untitled';
-    const providerName = req.body.provider || process.env.DEFAULT_TTS_PROVIDER || 'deepinfra';
+    const providerName = req.body.provider || process.env.DEFAULT_TTS_PROVIDER || 'segmind';
 
     // If file uploaded, extract text from it
     if (req.file) {
@@ -411,6 +411,7 @@ app.listen(PORT, () => {
 ║   URL: http://localhost:${PORT}                            ║
 ║                                                          ║
 ║   Providers configured:                                  ║
+║   - Segmind: ${process.env.SEGMIND_API_KEY ? '✓' : '✗'}                                      ║
 ║   - DeepInfra: ${process.env.DEEPINFRA_API_KEY ? '✓' : '✗'}                                    ║
 ║   - Hugging Face: ${process.env.HF_API_KEY ? '✓' : '✗'}                                 ║
 ║                                                          ║

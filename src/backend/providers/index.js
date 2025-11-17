@@ -6,16 +6,18 @@
 
 import { DeepInfraProvider } from './deepinfra.js';
 import { HuggingFaceProvider } from './huggingface.js';
+import { SegmindProvider } from './segmind.js';
 
 export class ProviderFactory {
   static providers = {
+    segmind: SegmindProvider,
     deepinfra: DeepInfraProvider,
     huggingface: HuggingFaceProvider
   };
 
   /**
    * Create a TTS provider instance
-   * @param {string} providerName - Name of the provider (deepinfra, huggingface)
+   * @param {string} providerName - Name of the provider (segmind, deepinfra, huggingface)
    * @param {string} apiKey - API key for the provider
    * @param {Object} config - Additional configuration
    * @returns {BaseTTSProvider} - Provider instance
@@ -60,4 +62,4 @@ export class ProviderFactory {
   }
 }
 
-export { DeepInfraProvider, HuggingFaceProvider };
+export { DeepInfraProvider, HuggingFaceProvider, SegmindProvider };

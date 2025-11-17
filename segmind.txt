@@ -1,0 +1,207 @@
+# 3B Orpheus TTS (0.1)
+
+> Orpheus TTS is an open-source text-to-speech (TTS) system powered by the Llama 3B language model, designed for high-quality and customizable speech synthesis.
+
+
+## Overview
+
+- **Endpoint**: `https://api.segmind.com/v1/orpheus-3b-0.1`
+- **Model ID**: `orpheus-3b-0.1`
+- **Category**: Text-to-Audio Generation
+- **Type**: Synchronous (Direct response)
+
+- **Average Cost**: $0.12492507753731338
+
+
+## API Information
+
+This model uses a **synchronous response pattern**:
+1. Make a POST request with your parameters
+2. Receive the output directly in the response (binary for images/videos/audio, JSON for text)
+3. No polling required - response is immediate
+
+
+### Input Schema
+
+The API accepts the following input parameters:
+
+- **`text`** (`string`, _required_):
+  Text
+
+- **`top_p`** (`number`, _optional_):
+  Top p
+  - Default: `0.95`
+  - Range: 0.1 to 1
+
+- **`voice`** (`string`, _optional_):
+  Voice
+  - Default: `"dan"`
+
+- **`temperature`** (`number`, _optional_):
+  Temperature
+  - Default: `0.6`
+  - Range: 0.1 to 1.5
+
+- **`max_new_tokens`** (`integer`, _optional_):
+  Max new tokens
+  - Default: `1200`
+  - Range: 100 to 2000
+
+- **`repetition_penalty`** (`number`, _optional_):
+  Repetition penalty
+  - Default: `1.1`
+  - Range: 1 to 2
+
+
+**Required Parameters Example**:
+
+```json
+{
+  "text": "Today has been... exhausting. <sigh> First, I missed the bus. Then it started pouring rain—of course, I forgot my umbrella. <groan> And just when I thought things couldn’t get worse, I spilled coffee all over my white shirt right before the presentation. <cough> But hey, at least I survived... kind of."
+}
+```
+
+
+**Full Example**:
+
+```json
+{
+  "text": "Today has been... exhausting. <sigh> First, I missed the bus. Then it started pouring rain—of course, I forgot my umbrella. <groan> And just when I thought things couldn’t get worse, I spilled coffee all over my white shirt right before the presentation. <cough> But hey, at least I survived... kind of.",
+  "top_p": 0.95,
+  "voice": "dan",
+  "temperature": 0.6,
+  "max_new_tokens": 1200,
+  "repetition_penalty": 1.1
+}
+```
+
+
+### Output Schema
+
+The API returns a synchronous response based on the model type:
+
+**For Image/Video/Audio Models**:
+- Response contains binary data (image/png, video/mp4, audio/mp3)
+- Content-Type header indicates the media type
+- Save the response body directly to a file
+
+**For Text Models**:
+- Response is JSON with the generated text
+- Structure varies by model
+
+**HTTP Response Codes**:
+- **200 - OK**: Request successful, output in response body
+- **400 - Bad Request**: Invalid parameters
+- **401 - Unauthorized**: Invalid or missing API key
+- **404 - Not Found**: Model not found
+- **406 - Not Acceptable**: Insufficient credits
+- **429 - Too Many Requests**: Rate limit exceeded
+- **500 - Server Error**: Internal server error
+
+
+## Usage Examples
+
+### cURL
+
+```bash
+curl -X POST "https://api.segmind.com/v1/orpheus-3b-0.1" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Today has been... exhausting. <sigh> First, I missed the bus. Then it started pouring rain—of course, I forgot my umbrella. <groan> And just when I thought things couldn’t get worse, I spilled coffee all over my white shirt right before the presentation. <cough> But hey, at least I survived... kind of.",
+  "top_p": 0.95,
+  "voice": "dan",
+  "temperature": 0.6,
+  "max_new_tokens": 1200,
+  "repetition_penalty": 1.1
+}'
+```
+
+### Python
+
+```python
+import requests
+import json
+
+api_key = "YOUR_API_KEY"
+url = "https://api.segmind.com/v1/orpheus-3b-0.1"
+
+data = {
+  "text": "Today has been... exhausting. <sigh> First, I missed the bus. Then it started pouring rain—of course, I forgot my umbrella. <groan> And just when I thought things couldn’t get worse, I spilled coffee all over my white shirt right before the presentation. <cough> But hey, at least I survived... kind of.",
+  "top_p": 0.95,
+  "voice": "dan",
+  "temperature": 0.6,
+  "max_new_tokens": 1200,
+  "repetition_penalty": 1.1
+}
+
+response = requests.post(
+    url,
+    json=data,
+    headers={
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+)
+
+if response.status_code == 200:
+    # For image/video/audio models, response.content contains the binary data
+    with open('output.png', 'wb') as f:
+        f.write(response.content)
+    print('Generation complete, saved to output.png')
+else:
+    print(f"Error: {response.status_code}")
+    print(response.text)
+```
+
+### JavaScript
+
+```javascript
+const apiKey = 'YOUR_API_KEY';
+const url = 'https://api.segmind.com/v1/orpheus-3b-0.1';
+
+const data = {
+  "text": "Today has been... exhausting. <sigh> First, I missed the bus. Then it started pouring rain—of course, I forgot my umbrella. <groan> And just when I thought things couldn’t get worse, I spilled coffee all over my white shirt right before the presentation. <cough> But hey, at least I survived... kind of.",
+  "top_p": 0.95,
+  "voice": "dan",
+  "temperature": 0.6,
+  "max_new_tokens": 1200,
+  "repetition_penalty": 1.1
+};
+
+const response = await fetch(url, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+});
+
+if (response.ok) {
+  // For image/video/audio models, response contains binary data
+  const blob = await response.blob();
+  const downloadUrl = URL.createObjectURL(blob);
+
+  // Create download link
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = 'output.png';
+  a.click();
+
+  console.log('Generation complete');
+}
+```
+
+
+## Additional Resources
+
+### Documentation
+
+- [Model Playground](https://www.segmind.com/models/orpheus-3b-0.1)
+- [API Documentation](https://www.segmind.com/models/orpheus-3b-0.1/api)
+- [Platform Documentation](https://docs.segmind.com/)
+
+### Tags
+
+No tags available
