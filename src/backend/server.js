@@ -420,14 +420,14 @@ app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
-║         Orpheus TTS Reader - Server Running             ║
+║         Orpheus TTS Reader - Server Running              ║
 ║                                                          ║
-║   URL: http://localhost:${PORT.toString().padEnd(4)}                        ║
+║   URL: http://localhost:${PORT.toString().padEnd(4)}     ║
 ║                                                          ║
 ║   Providers configured:                                  ║
-║   - Segmind: ${segmindStatus}                                           ║
-║   - DeepInfra: ${deepinfraStatus}                                         ║
-║   - Hugging Face: ${hfStatus}                                        ║
+║   - Segmind: ${segmindStatus}                            ║
+║   - DeepInfra: ${deepinfraStatus}                        ║
+║   - Hugging Face: ${hfStatus}                            ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
   `);
