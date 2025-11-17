@@ -403,17 +403,21 @@ app.use((err, req, res, next) => {
 // ==================== Start Server ====================
 
 app.listen(PORT, () => {
+  const segmindStatus = process.env.SEGMIND_API_KEY ? '✓' : '✗';
+  const deepinfraStatus = process.env.DEEPINFRA_API_KEY ? '✓' : '✗';
+  const hfStatus = process.env.HF_API_KEY ? '✓' : '✗';
+
   console.log(`
 ╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
 ║         Orpheus TTS Reader - Server Running             ║
 ║                                                          ║
-║   URL: http://localhost:${PORT}                            ║
+║   URL: http://localhost:${PORT.toString().padEnd(4)}                        ║
 ║                                                          ║
 ║   Providers configured:                                  ║
-║   - Segmind: ${process.env.SEGMIND_API_KEY ? '✓' : '✗'}                                      ║
-║   - DeepInfra: ${process.env.DEEPINFRA_API_KEY ? '✓' : '✗'}                                    ║
-║   - Hugging Face: ${process.env.HF_API_KEY ? '✓' : '✗'}                                 ║
+║   - Segmind: ${segmindStatus}                                           ║
+║   - DeepInfra: ${deepinfraStatus}                                         ║
+║   - Hugging Face: ${hfStatus}                                        ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
   `);
