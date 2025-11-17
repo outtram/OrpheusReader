@@ -59,6 +59,98 @@
             </select>
           </div>
 
+          <!-- Advanced Settings Toggle -->
+          <div class="form-group">
+            <button type="button" id="toggleAdvanced" class="btn-secondary">
+              Advanced Settings ▼
+            </button>
+          </div>
+
+          <!-- Advanced Settings Panel -->
+          <div id="advancedSettings" class="advanced-settings hidden">
+            <div class="settings-grid">
+              <!-- Voice Selection -->
+              <div class="form-group">
+                <label for="voice">Voice</label>
+                <select id="voice" name="voice">
+                  <option value="tara" selected>Tara (Female)</option>
+                  <option value="dan">Dan (Male)</option>
+                  <option value="bella">Bella (Female)</option>
+                  <option value="nicole">Nicole (Female)</option>
+                  <option value="sarah">Sarah (Female)</option>
+                </select>
+              </div>
+
+              <!-- Temperature -->
+              <div class="form-group">
+                <label for="temperature">
+                  Temperature: <span id="tempValue">0.6</span>
+                </label>
+                <input
+                  type="range"
+                  id="temperature"
+                  name="temperature"
+                  min="0.1"
+                  max="1.5"
+                  step="0.1"
+                  value="0.6"
+                >
+                <small>Lower = more deterministic, Higher = more creative</small>
+              </div>
+
+              <!-- Top P -->
+              <div class="form-group">
+                <label for="top_p">
+                  Top P: <span id="topPValue">0.95</span>
+                </label>
+                <input
+                  type="range"
+                  id="top_p"
+                  name="top_p"
+                  min="0.1"
+                  max="1.0"
+                  step="0.05"
+                  value="0.95"
+                >
+                <small>Nucleus sampling - lower is more focused</small>
+              </div>
+
+              <!-- Max Tokens -->
+              <div class="form-group">
+                <label for="max_new_tokens">
+                  Max Tokens: <span id="maxTokensValue">1200</span>
+                </label>
+                <input
+                  type="range"
+                  id="max_new_tokens"
+                  name="max_new_tokens"
+                  min="100"
+                  max="2000"
+                  step="100"
+                  value="1200"
+                >
+                <small>Maximum length of generated audio</small>
+              </div>
+
+              <!-- Repetition Penalty -->
+              <div class="form-group">
+                <label for="repetition_penalty">
+                  Repetition Penalty: <span id="repPenaltyValue">1.1</span>
+                </label>
+                <input
+                  type="range"
+                  id="repetition_penalty"
+                  name="repetition_penalty"
+                  min="1.0"
+                  max="2.0"
+                  step="0.1"
+                  value="1.1"
+                >
+                <small>Higher values reduce repetition in speech</small>
+              </div>
+            </div>
+          </div>
+
           <!-- Text Input -->
           <div class="form-group">
             <label for="text">Text Content</label>

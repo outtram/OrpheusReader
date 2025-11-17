@@ -26,7 +26,7 @@ export class SegmindProvider extends BaseTTSProvider {
    *
    * @param {string} text - Text to convert to speech
    * @param {Object} options - Generation options
-   * @param {string} options.voice - Voice to use (default: 'dan')
+   * @param {string} options.voice - Voice to use (default: 'tara')
    * @param {number} options.temperature - Temperature (0.1-1.5, default: 0.6)
    * @param {number} options.top_p - Top P sampling (0.1-1, default: 0.95)
    * @param {number} options.max_new_tokens - Max tokens (100-2000, default: 1200)
@@ -48,7 +48,7 @@ export class SegmindProvider extends BaseTTSProvider {
 
     const payload = {
       text: text.trim(),
-      voice: options.voice || 'dan',
+      voice: options.voice || 'tara',
       temperature: options.temperature || 0.6,
       top_p: options.top_p || 0.95,
       max_new_tokens: options.max_new_tokens || 1200,
@@ -140,9 +140,9 @@ export class SegmindProvider extends BaseTTSProvider {
    * @returns {Array<string>} List of available voice names
    */
   getAvailableVoices() {
-    // Based on the API documentation, 'dan' is the default
-    // Additional voices may be available - check Segmind docs
-    return ['dan'];
+    // Orpheus TTS typically supports these voices
+    // Even if not all documented, the API may support them
+    return ['tara', 'dan', 'bella', 'nicole', 'sarah'];
   }
 
   /**
@@ -154,7 +154,7 @@ export class SegmindProvider extends BaseTTSProvider {
     return {
       voice: {
         type: 'string',
-        default: 'dan',
+        default: 'tara',
         options: this.getAvailableVoices(),
         description: 'Voice to use for speech generation'
       },

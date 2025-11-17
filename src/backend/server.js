@@ -78,6 +78,15 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
     const title = req.body.title || 'Untitled';
     const providerName = req.body.provider || process.env.DEFAULT_TTS_PROVIDER || 'segmind';
 
+    // Get advanced TTS options
+    const ttsOptions = {
+      voice: req.body.voice || 'tara',
+      temperature: parseFloat(req.body.temperature) || 0.6,
+      top_p: parseFloat(req.body.top_p) || 0.95,
+      max_new_tokens: parseInt(req.body.max_new_tokens) || 1200,
+      repetition_penalty: parseFloat(req.body.repetition_penalty) || 1.1
+    };
+
     // If file uploaded, extract text from it
     if (req.file) {
       const parser = new FileParser();
@@ -102,8 +111,8 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
       provider: providerName
     });
 
-    // Start background job
-    processConversion(conversion.id, text, providerName).catch(error => {
+    // Start background job with TTS options
+    processConversion(conversion.id, text, providerName, ttsOptions).catch(error => {
       console.error('Conversion error:', error);
       storage.updateConversion(conversion.id, {
         status: 'failed',
@@ -298,7 +307,7 @@ app.get('/api/stats', async (req, res) => {
 /**
  * Process a conversion in the background
  */
-async function processConversion(conversionId, text, providerName) {
+async function processConversion(conversionId, text, providerName, ttsOptions = {}) {
   const storage = getStorage();
 
   try {
@@ -320,6 +329,7 @@ async function processConversion(conversionId, text, providerName) {
     const chunks = chunker.chunk(text);
 
     console.log(`Processing ${chunks.length} chunks for conversion ${conversionId}`);
+    console.log(`TTS Options:`, ttsOptions);
 
     // Update job status
     jobs.set(conversionId, {
@@ -328,13 +338,13 @@ async function processConversion(conversionId, text, providerName) {
       progress: 0
     });
 
-    // Generate audio for each chunk
+    // Generate audio for each chunk with TTS options
     const audioBuffers = [];
 
     for (let i = 0; i < chunks.length; i++) {
       console.log(`Generating audio for chunk ${i + 1}/${chunks.length}`);
 
-      const audioBuffer = await provider.generateSpeech(chunks[i]);
+      const audioBuffer = await provider.generateSpeech(chunks[i], ttsOptions);
       audioBuffers.push(audioBuffer);
 
       // Update progress

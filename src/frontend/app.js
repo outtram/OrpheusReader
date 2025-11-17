@@ -32,6 +32,18 @@ const downloadBtn = document.getElementById('downloadBtn');
 const errorSection = document.getElementById('errorSection');
 const errorMessage = document.getElementById('errorMessage');
 
+// Advanced Settings
+const toggleAdvanced = document.getElementById('toggleAdvanced');
+const advancedSettings = document.getElementById('advancedSettings');
+const tempSlider = document.getElementById('temperature');
+const tempValue = document.getElementById('tempValue');
+const topPSlider = document.getElementById('top_p');
+const topPValue = document.getElementById('topPValue');
+const maxTokensSlider = document.getElementById('max_new_tokens');
+const maxTokensValue = document.getElementById('maxTokensValue');
+const repPenaltySlider = document.getElementById('repetition_penalty');
+const repPenaltyValue = document.getElementById('repPenaltyValue');
+
 // State
 let currentConversionId = null;
 let currentFile = null;
@@ -58,8 +70,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Download button
   downloadBtn.addEventListener('click', handleDownload);
 
+  // Advanced settings toggle
+  toggleAdvanced.addEventListener('click', toggleAdvancedSettings);
+
+  // Slider value updates
+  tempSlider.addEventListener('input', (e) => {
+    tempValue.textContent = parseFloat(e.target.value).toFixed(1);
+    updateSliderGradient(e.target);
+  });
+
+  topPSlider.addEventListener('input', (e) => {
+    topPValue.textContent = parseFloat(e.target.value).toFixed(2);
+    updateSliderGradient(e.target);
+  });
+
+  maxTokensSlider.addEventListener('input', (e) => {
+    maxTokensValue.textContent = e.target.value;
+    updateSliderGradient(e.target);
+  });
+
+  repPenaltySlider.addEventListener('input', (e) => {
+    repPenaltyValue.textContent = parseFloat(e.target.value).toFixed(1);
+    updateSliderGradient(e.target);
+  });
+
   // Initial character count
   updateCharCount();
+
+  // Initialize slider gradients
+  updateSliderGradient(tempSlider);
+  updateSliderGradient(topPSlider);
+  updateSliderGradient(maxTokensSlider);
+  updateSliderGradient(repPenaltySlider);
 });
 
 // ==================== Character Counter ====================
@@ -166,6 +208,13 @@ async function handleSubmit(event) {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('provider', provider);
+
+  // Add advanced settings
+  formData.append('voice', document.getElementById('voice').value);
+  formData.append('temperature', tempSlider.value);
+  formData.append('top_p', topPSlider.value);
+  formData.append('max_new_tokens', maxTokensSlider.value);
+  formData.append('repetition_penalty', repPenaltySlider.value);
 
   if (currentFile) {
     formData.append('file', currentFile);
@@ -333,3 +382,20 @@ function resetForm() {
 
 // Optional: Add reset button listener if you add one
 // document.getElementById('resetBtn')?.addEventListener('click', resetForm);
+
+// ==================== Advanced Settings ====================
+
+function toggleAdvancedSettings() {
+  const isHidden = advancedSettings.classList.toggle('hidden');
+  toggleAdvanced.textContent = isHidden ? 'Advanced Settings ▼' : 'Advanced Settings ▲';
+}
+
+function updateSliderGradient(slider) {
+  const min = parseFloat(slider.min);
+  const max = parseFloat(slider.max);
+  const value = parseFloat(slider.value);
+  const percentage = ((value - min) / (max - min)) * 100;
+
+  slider.style.background = `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${percentage}%, #E5E5E7 ${percentage}%, #E5E5E7 100%)`;
+}
+
