@@ -102,13 +102,15 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
       });
     }
 
-    // Create storage record
+    // Create storage record with TTS settings and original filename
     const storage = getStorage();
     const conversion = await storage.saveConversion({
       title,
       text,
       status: 'processing',
-      provider: providerName
+      provider: providerName,
+      ttsSettings: ttsOptions,
+      originalFileName: req.file ? req.file.originalname : null
     });
 
     // Start background job with TTS options

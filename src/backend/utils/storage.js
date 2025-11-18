@@ -83,6 +83,18 @@ export class ConversionStorage {
   /**
    * Save a new conversion
    * @param {Object} conversion - Conversion data
+   * @param {string} conversion.title - Conversion title
+   * @param {string} conversion.text - Full text to convert
+   * @param {string} conversion.audioPath - Path to audio file
+   * @param {string} conversion.status - Conversion status
+   * @param {string} conversion.provider - TTS provider
+   * @param {Object} conversion.ttsSettings - TTS settings object
+   * @param {string} conversion.ttsSettings.voice - Voice used
+   * @param {number} conversion.ttsSettings.temperature - Temperature value
+   * @param {number} conversion.ttsSettings.top_p - Top P value
+   * @param {number} conversion.ttsSettings.max_new_tokens - Max tokens value
+   * @param {number} conversion.ttsSettings.repetition_penalty - Repetition penalty value
+   * @param {string} conversion.originalFileName - Original filename (if uploaded)
    * @returns {Promise<Object>} - Saved conversion with ID
    */
   async saveConversion(conversion) {
@@ -100,7 +112,10 @@ export class ConversionStorage {
       status: conversion.status || 'pending',
       provider: conversion.provider || 'unknown',
       chunkCount: conversion.chunkCount || 0,
-      characterCount: conversion.text ? conversion.text.length : 0
+      characterCount: conversion.text ? conversion.text.length : 0,
+      // New fields for detailed history
+      ttsSettings: conversion.ttsSettings || null,
+      originalFileName: conversion.originalFileName || null
     };
 
     metadata.conversions.push(newConversion);

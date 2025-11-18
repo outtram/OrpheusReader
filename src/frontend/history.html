@@ -113,6 +113,89 @@
     </div>
   </div>
 
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detailModalTitle">Conversion Details</h2>
+        <button class="icon-btn modal-close" id="closeDetailModal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Basic Info Section -->
+        <div class="detail-section">
+          <div class="detail-row">
+            <span class="detail-label">Title:</span>
+            <span class="detail-value" id="detailTitle"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value" id="detailDate"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Duration:</span>
+            <span class="detail-value" id="detailDuration"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Provider:</span>
+            <span class="detail-value" id="detailProvider"></span>
+          </div>
+          <div class="detail-row" id="detailFileNameRow" style="display: none;">
+            <span class="detail-label">Original File:</span>
+            <span class="detail-value" id="detailFileName"></span>
+          </div>
+        </div>
+
+        <!-- Original Text Section -->
+        <div class="detail-section">
+          <h3 class="detail-section-title">Original Text</h3>
+          <div class="text-content-container">
+            <pre class="text-content" id="detailText"></pre>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="copyTextBtn" style="margin-top: 1rem;">
+            Copy Text
+          </button>
+        </div>
+
+        <!-- TTS Settings Section -->
+        <div class="detail-section">
+          <h3 class="detail-section-title">TTS Settings</h3>
+          <div class="settings-grid">
+            <div class="setting-item">
+              <span class="setting-label">Voice:</span>
+              <span class="setting-value" id="detailVoice"></span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Temperature:</span>
+              <span class="setting-value" id="detailTemperature"></span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Top P:</span>
+              <span class="setting-value" id="detailTopP"></span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Max Tokens:</span>
+              <span class="setting-value" id="detailMaxTokens"></span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Repetition Penalty:</span>
+              <span class="setting-value" id="detailRepPenalty"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Output Section -->
+        <div class="detail-section">
+          <h3 class="detail-section-title">Audio Output</h3>
+          <audio id="detailAudio" controls style="width: 100%; border-radius: var(--radius-md);"></audio>
+          <button class="btn btn-primary btn-sm" id="downloadDetailBtn" style="margin-top: 1rem; width: 100%;">
+            Download MP3
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // History page JavaScript
     const API_BASE = '/api';
@@ -129,6 +212,33 @@
       document.getElementById('filterStatus').addEventListener('change', filterConversions);
       document.getElementById('sortBy').addEventListener('change', filterConversions);
       document.getElementById('closeModal').addEventListener('click', closeAudioModal);
+
+      // Detail modal event listeners
+      document.getElementById('closeDetailModal').addEventListener('click', closeDetailModal);
+      document.getElementById('copyTextBtn').addEventListener('click', copyTextToClipboard);
+      document.getElementById('downloadDetailBtn').addEventListener('click', downloadDetailAudio);
+
+      // Close modals on ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const detailModal = document.getElementById('detailModal');
+          if (!detailModal.classList.contains('hidden')) {
+            closeDetailModal();
+          }
+
+          const audioModal = document.getElementById('audioModal');
+          if (!audioModal.classList.contains('hidden')) {
+            closeAudioModal();
+          }
+        }
+      });
+
+      // Close detail modal on overlay click
+      document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'detailModal') {
+          closeDetailModal();
+        }
+      });
     });
 
     // Load all conversions
@@ -192,11 +302,14 @@
 
           ${conv.status === 'completed' ? `
             <div class="history-card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="openDetailModal('${conv.id}')" style="flex: 1;">
+                View Details
+              </button>
               <button class="btn btn-primary btn-sm" onclick="playAudio('${conv.id}', '${escapeHtml(conv.title)}')">
-                ▶️ Play
+                ▶️
               </button>
               <button class="btn btn-secondary btn-sm" onclick="downloadAudio('${conv.id}', '${escapeHtml(conv.title)}')">
-                📥 Download
+                📥
               </button>
               <button class="icon-btn" onclick="deleteConversion('${conv.id}')" title="Delete">
                 🗑️
@@ -363,6 +476,139 @@
     function showError(message) {
       alert(message);
     }
+
+    // ==================== Detail Modal Functions ====================
+
+    let currentDetailConversion = null;
+
+    // Open detail modal
+    async function openDetailModal(id) {
+      try {
+        // Fetch full conversion details
+        const response = await fetch(`${API_BASE}/conversions/${id}`);
+        const conversion = await response.json();
+
+        if (!response.ok) {
+          throw new Error('Failed to load conversion details');
+        }
+
+        currentDetailConversion = conversion;
+
+        // Populate modal with data
+        document.getElementById('detailTitle').textContent = conversion.title;
+        document.getElementById('detailDate').textContent = formatDetailDate(conversion.createdAt);
+        document.getElementById('detailDuration').textContent = formatDuration(conversion.duration);
+        document.getElementById('detailProvider').textContent = conversion.provider || 'N/A';
+
+        // Show original filename if available
+        if (conversion.originalFileName) {
+          document.getElementById('detailFileName').textContent = conversion.originalFileName;
+          document.getElementById('detailFileNameRow').style.display = 'flex';
+        } else {
+          document.getElementById('detailFileNameRow').style.display = 'none';
+        }
+
+        // Populate original text
+        document.getElementById('detailText').textContent = conversion.text || 'No text available';
+
+        // Populate TTS settings (with backward compatibility)
+        if (conversion.ttsSettings) {
+          document.getElementById('detailVoice').textContent = conversion.ttsSettings.voice || 'N/A';
+          document.getElementById('detailTemperature').textContent = conversion.ttsSettings.temperature || 'N/A';
+          document.getElementById('detailTopP').textContent = conversion.ttsSettings.top_p || 'N/A';
+          document.getElementById('detailMaxTokens').textContent = conversion.ttsSettings.max_new_tokens || 'N/A';
+          document.getElementById('detailRepPenalty').textContent = conversion.ttsSettings.repetition_penalty || 'N/A';
+        } else {
+          // Show N/A for old conversions without settings
+          document.getElementById('detailVoice').textContent = 'N/A';
+          document.getElementById('detailTemperature').textContent = 'N/A';
+          document.getElementById('detailTopP').textContent = 'N/A';
+          document.getElementById('detailMaxTokens').textContent = 'N/A';
+          document.getElementById('detailRepPenalty').textContent = 'N/A';
+        }
+
+        // Set audio source
+        const detailAudio = document.getElementById('detailAudio');
+        detailAudio.src = `${API_BASE}/conversions/${id}/audio`;
+
+        // Show modal
+        document.getElementById('detailModal').classList.remove('hidden');
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+      } catch (error) {
+        console.error('Failed to load conversion details:', error);
+        alert('Failed to load conversion details');
+      }
+    }
+
+    // Close detail modal
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      const audio = document.getElementById('detailAudio');
+
+      // Pause and reset audio
+      audio.pause();
+      audio.src = '';
+
+      // Hide modal
+      modal.classList.add('hidden');
+
+      // Restore body scroll
+      document.body.style.overflow = '';
+
+      currentDetailConversion = null;
+    }
+
+    // Copy text to clipboard
+    async function copyTextToClipboard() {
+      if (!currentDetailConversion) return;
+
+      const text = currentDetailConversion.text;
+
+      try {
+        await navigator.clipboard.writeText(text);
+
+        // Visual feedback
+        const btn = document.getElementById('copyTextBtn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = 'var(--color-success)';
+        btn.style.color = 'white';
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 2000);
+      } catch (error) {
+        console.error('Failed to copy text:', error);
+        alert('Failed to copy text to clipboard');
+      }
+    }
+
+    // Download audio from detail modal
+    function downloadDetailAudio() {
+      if (!currentDetailConversion) return;
+
+      const link = document.createElement('a');
+      link.href = `${API_BASE}/conversions/${currentDetailConversion.id}/audio`;
+      link.download = `${currentDetailConversion.title}.mp3`;
+      link.click();
+    }
+
+    // Format date for detail view
+    function formatDetailDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
   </script>
 </body>
 </html>
